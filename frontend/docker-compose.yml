@@ -2,9 +2,10 @@ version: '3'
 
 services:
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: yousha234/frontend:latest  # Pull the image from Docker Hub
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "4000:4000"
     working_dir: /app/frontend
