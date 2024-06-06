@@ -1,9 +1,9 @@
-name: Docker Build and Publish
+name: Docker Build, Publish and Pull on EC2
 
 on: [push]
 
 jobs:
-  hello-world-job:
+  docker-build-publish-then-pull-on-ec2:
     runs-on: ubuntu-latest
 
     steps:
