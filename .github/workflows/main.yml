@@ -1,6 +1,10 @@
 name: Docker Build, Publish and Pull on EC2
 
-on: [push]
+on:
+  push:
+    paths:
+      - 'frontend/**'
+      - 'backend/**'
 
 jobs:
   docker-build-publish-then-pull-on-ec2:
