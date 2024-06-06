@@ -1,0 +1,3 @@
+# This file is created to test that pipeline should not trigger if this file is changed, it should only trigger if frontend/ or backend/ change.
+
+Version: 1.00
