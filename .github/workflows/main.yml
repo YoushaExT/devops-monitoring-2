@@ -67,11 +67,11 @@ jobs:
     #     docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest -f Dockerfile .
     #     docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
       
-    # - name: Tag commit with Docker build information
-    #   if: steps.check_changes.outputs.changed == 'true'
-    #   run: |
-    #     DOCKER_BUILD_TAG="docker-build-$(date +%Y%m%d%H%M%S)"
-    #     git tag -a "$DOCKER_BUILD_TAG" -m "Docker build executed"
-    #     git push --tags
-    #     echo "::set-output name=DOCKER_BUILD_TAG::$DOCKER_BUILD_TAG"
-    #   shell: bash
+    - name: Tag commit with Docker build information
+      if: steps.check_changes.outputs.changed == 'true'
+      run: |
+        DOCKER_BUILD_TAG="docker-build-$(date +%Y%m%d%H%M%S)"
+        git tag -a "$DOCKER_BUILD_TAG" -m "Docker build executed"
+        git push --tags
+        echo "::set-output name=DOCKER_BUILD_TAG::$DOCKER_BUILD_TAG"
+      shell: bash
