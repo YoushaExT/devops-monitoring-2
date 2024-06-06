@@ -5,10 +5,19 @@ on:
     paths:
       - 'frontend/**'
       - 'backend/**'
+      - '.github/workflows/main.yaml'
+
+env:
+  AWS_ROLE_ASSUME : "arn:aws:iam::214543393762:role/github-action-read-aws-ec2"
+  AWS_REGION : "us-east-1"
 
 jobs:
   docker-build-publish-then-pull-on-ec2:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
     - name: Checkout repository
@@ -16,6 +25,18 @@ jobs:
     
     - name: List files after checkout
       run: ls
+
+    - name: Setup Aws Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ env.AWS_ROLE_ASSUME }}
+        aws-region: ${{ env.AWS_REGION }}
+        role-session-name: ga-role-session
+
+    - name: List ec2 public ip
+      run: |
+        EC2_PUBLIC_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters 'Name=instance-state-name,Values=running' 'Name=tag:Name,Values=tf_created_ec2_ubuntu_frontend' --output text)
+        echo "EC2 Instance IP: $EC2_PUBLIC_IP"
 
     - name: Retrieve Docker build tag
       id: retrieve_tag
