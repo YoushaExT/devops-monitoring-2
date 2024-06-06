@@ -67,7 +67,7 @@ jobs:
     #     docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest -f Dockerfile .
     #     docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
 
-    - name: List files after checkout
+    - name: Configure git user
       if: steps.check_changes.outputs.changed == 'true'
       run: |
         git config --global user.email "github-action-runner@example.com"
