@@ -25,7 +25,8 @@ jobs:
     - name: Check for changes in frontend folder
       id: check_changes
       run: |
-        if test -z "${{ steps.retrieve_tag.outputs.DOCKER_BUILD_TAG }}"; then
+        DOCKER_BUILD_TAG="${{ steps.retrieve_tag.outputs.DOCKER_BUILD_TAG }}"
+        if test -z "$DOCKER_BUILD_TAG"; then
           echo "No Docker build tag exists."
           echo "::set-output name=changed::true"
         else
