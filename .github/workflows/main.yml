@@ -117,6 +117,6 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
           docker stop frontend || true
-          docker run -d -p 4000:4000 -v /var/www/backend/server/frontend:/app/frontend -w /app/frontend ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+          docker run -d -p 4000:4000 -v /var/www/backend/server/frontend:/app/frontend -w /app/frontend ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
