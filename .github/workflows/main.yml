@@ -120,4 +120,5 @@ jobs:
           cd /var/www/backend/server/frontend/
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
           docker stop frontend || true
+          docker rm frontend || true
           docker run -d --name frontend -p 4000:4000 --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
