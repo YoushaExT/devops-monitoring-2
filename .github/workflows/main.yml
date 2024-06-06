@@ -24,5 +24,6 @@ jobs:
 
     - name: Build and push frontend image
       run: |
+        cd frontend/
         docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest -f frontend/Dockerfile .
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
