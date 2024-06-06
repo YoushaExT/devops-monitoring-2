@@ -119,4 +119,4 @@ jobs:
         script: |
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
           docker stop frontend || true
-          docker run -d -p 4000:4000 -v /var/www/backend/server/frontend:/app/frontend -w /app/frontend ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+          docker run -d --name frontend -p 4000:4000 --env-file .env ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
