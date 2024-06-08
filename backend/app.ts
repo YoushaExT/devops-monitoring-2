@@ -8,7 +8,7 @@ dotenv.config(); // Load the environment variables from .env to process.env obje
 const PORT = 5000;
 const app = express();
 
-const version = '1.0.1';
+const version = '1.0.2';
 console.log('Starting backend version:', version);
 
 app.use(bodyParser.json());
