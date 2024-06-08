@@ -2,6 +2,8 @@ import express from 'express'
 import bodyParser from 'body-parser';
 import coursesRouter from './routes/courses-routes';
 
+import * as dotenv from 'dotenv'
+dotenv.config() // Load the environment variables from .env to process.env object
 
 const PORT = 5000;
 const app = express();
