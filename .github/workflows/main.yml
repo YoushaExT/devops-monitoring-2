@@ -132,28 +132,35 @@ jobs:
 
     - name: List ec2 public ip
       if: steps.check_changes_frontend.outputs.frontend_changed == 'true' || steps.check_changes_backend.outputs.backend_changed == 'true'
-      id: list_ec2_public_ip
+      id: list_ec2_ip
       run: |
-        FRONTEND_EC2_PUBLIC_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters 'Name=instance-state-name,Values=running' 'Name=tag:Name,Values=tf_created_ec2_ubuntu_frontend' --output text)
-        echo "EC2 Instance IP: $FRONTEND_EC2_PUBLIC_IP"
-        echo "FRONTEND_EC2_PUBLIC_IP=$FRONTEND_EC2_PUBLIC_IP" >> $GITHUB_OUTPUT
-        BACKEND_EC2_PUBLIC_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters 'Name=instance-state-name,Values=running' 'Name=tag:Name,Values=tf_created_ec2_ubuntu_backend' --output text)
-        echo "EC2 Instance IP: $BACKEND_EC2_PUBLIC_IP"
-        echo "BACKEND_EC2_PUBLIC_IP=$BACKEND_EC2_PUBLIC_IP" >> $GITHUB_OUTPUT
+        BASTION_EC2_PUBLIC_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters 'Name=instance-state-name,Values=running' 'Name=tag:Name,Values=tf_created_ec2_ubuntu_bastion' --output text)
+        echo "EC2 Instance IP: $BASTION_EC2_PUBLIC_IP"
+        echo "BASTION_EC2_PUBLIC_IP=$BASTION_EC2_PUBLIC_IP" >> $GITHUB_OUTPUT
+        FRONTEND_EC2_PRIVATE_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PrivateIpAddress' --filters 'Name=instance-state-name,Values=running' 'Name=tag:Name,Values=tf_created_ec2_ubuntu_frontend' --output text)
+        echo "EC2 Instance IP: $FRONTEND_EC2_PRIVATE_IP"
+        echo "FRONTEND_EC2_PRIVATE_IP=$FRONTEND_EC2_PRIVATE_IP" >> $GITHUB_OUTPUT
+        BACKEND_EC2_PRIVATE_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PrivateIpAddress' --filters 'Name=instance-state-name,Values=running' 'Name=tag:Name,Values=tf_created_ec2_ubuntu_backend' --output text)
+        echo "EC2 Instance IP: $BACKEND_EC2_PRIVATE_IP"
+        echo "BACKEND_EC2_PRIVATE_IP=$BACKEND_EC2_PRIVATE_IP" >> $GITHUB_OUTPUT
 
     - name: Print out ip
       if: steps.check_changes_frontend.outputs.frontend_changed == 'true' || steps.check_changes_backend.outputs.backend_changed == 'true'
       run: |
-        echo "${{ steps.list_ec2_public_ip.outputs.FRONTEND_EC2_PUBLIC_IP }}"
-        echo "${{ steps.list_ec2_public_ip.outputs.BACKEND_EC2_PUBLIC_IP }}"
+        echo "${{ steps.list_ec2_ip.outputs.BASTION_EC2_PUBLIC_IP }}"
+        echo "${{ steps.list_ec2_ip.outputs.FRONTEND_EC2_PRIVATE_IP }}"
+        echo "${{ steps.list_ec2_ip.outputs.BACKEND_EC2_PRIVATE_IP }}"
 
     - name: SSH and update Frontend EC2
       if: steps.check_changes_frontend.outputs.frontend_changed == 'true'
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ steps.list_ec2_public_ip.outputs.FRONTEND_EC2_PUBLIC_IP }}
+        host: ${{ steps.list_ec2_ip.outputs.FRONTEND_EC2_PRIVATE_IP }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
+        proxy_host: ${{ steps.list_ec2_ip.outputs.BASTION_EC2_PUBLIC_IP }}
+        proxy_username: ubuntu
+        proxy_key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd /var/www/frontend/
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
@@ -165,9 +172,12 @@ jobs:
       if: steps.check_changes_backend.outputs.backend_changed == 'true'
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ steps.list_ec2_public_ip.outputs.BACKEND_EC2_PUBLIC_IP }}
+        host: ${{ steps.list_ec2_ip.outputs.BACKEND_EC2_PRIVATE_IP }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
+        proxy_host: ${{ steps.list_ec2_ip.outputs.BASTION_EC2_PUBLIC_IP }}
+        proxy_username: ubuntu
+        proxy_key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd /var/www/backend/server/backend/
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
